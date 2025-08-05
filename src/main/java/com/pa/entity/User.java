@@ -1,6 +1,6 @@
 package com.pa.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,6 +11,8 @@ import com.pa.enums.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,9 +24,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_info")
 @Getter
 @Setter
+@Table(name = "user_info")
 public class User {
 
 	@Id
@@ -34,9 +36,10 @@ public class User {
 	private String name;
 
 	@Email(message = "Enter a valid email")
-	@Column(unique = true, nullable = false)
+	@Column(unique = true)
 	private String email;
 
+	@Column(unique = true)
 	private Long phone;
 
 	@Size(min = 5, message = "Password must be of 5 or more than 5 letters")
@@ -45,16 +48,20 @@ public class User {
 	@OneToMany(mappedBy = "user")
 	private List<Presentation> presentations;
 
-	private Status status;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Status status = Status.ACTIVE;
 
-	private Role role;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Role role = Role.STUDENT;
 
 	private Double userTotalScore;
 
 	@CreationTimestamp
 	@Column(updatable = false)
-	private LocalDateTime createdAt;
+	private LocalDate createdAt;
 
 	@UpdateTimestamp
-	private LocalDateTime updatedAt;
+	private LocalDate updatedAt;
 }
