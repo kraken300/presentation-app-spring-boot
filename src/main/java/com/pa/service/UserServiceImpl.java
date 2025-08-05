@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.pa.dao.UserDAO;
 
 @Service
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDAO;
