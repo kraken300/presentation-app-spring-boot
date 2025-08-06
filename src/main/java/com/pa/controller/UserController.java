@@ -27,7 +27,7 @@ public class UserController {
 
 	// REGISTER USER
 	@PostMapping
-	public ResponseEntity<String> registerUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
+	public ResponseEntity<?> registerUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
 		return userService.registerUser(userRequestDTO);
 	}
 
@@ -49,10 +49,11 @@ public class UserController {
 		return userService.getAllUsers(id);
 	}
 
-	// Update Status (Only By ADMIN)
+	// UPDATE STATUS (ONLY BY ADMIN)
 	@PutMapping("/{id}")
 	public ResponseEntity<String> updateStatus(@PathVariable(name = "id") Integer adminId,
 			@RequestParam(name = "id") Integer userId, @RequestParam Status status) {
 		return userService.updateStatus(adminId, userId, status);
 	}
+	
 }

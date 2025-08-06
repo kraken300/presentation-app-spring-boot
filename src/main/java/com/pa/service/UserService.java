@@ -8,7 +8,7 @@ import com.pa.enums.Status;
 
 public interface UserService {
 
-	ResponseEntity<String> registerUser(UserRequestDTO userRequestDTO);
+	ResponseEntity<?> registerUser(UserRequestDTO userRequestDTO);
 
 	ResponseEntity<String> loginUser(UserLoginDTO userLoginDTO);
 

@@ -17,6 +17,7 @@ import com.pa.dto.UserResponseDTO;
 import com.pa.entity.User;
 import com.pa.enums.Role;
 import com.pa.enums.Status;
+import com.pa.rs.ResponseStructure;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
 	private UserDAO userDAO;
 
 	@Override
-	public ResponseEntity<String> registerUser(UserRequestDTO userRequestDTO) {
+	public ResponseEntity<?> registerUser(UserRequestDTO userRequestDTO) {
 
 		Optional<User> isUserPresent = userDAO.findByEmail(userRequestDTO.getEmail());
 
@@ -34,8 +35,10 @@ public class UserServiceImpl implements UserService {
 		} else {
 			User user = new User();
 			BeanUtils.copyProperties(userRequestDTO, user);
-			userDAO.save(user);
-			return new ResponseEntity<String>("User registered successfully!", HttpStatus.CREATED);
+			User saved = userDAO.save(user);
+			ResponseStructure<String> rs = new ResponseStructure<String>("User registered successfully with email : ",
+					saved.getEmail(), HttpStatus.CREATED);
+			return new ResponseEntity<ResponseStructure<String>>(rs, HttpStatus.OK);
 		}
 	}
 
@@ -57,7 +60,9 @@ public class UserServiceImpl implements UserService {
 		if (user.getStatus() == Status.ACTIVE) {
 			UserResponseDTO responseDTO = new UserResponseDTO();
 			BeanUtils.copyProperties(user, responseDTO);
-			return new ResponseEntity<UserResponseDTO>(responseDTO, HttpStatus.OK);
+			ResponseStructure<UserResponseDTO> rs = new ResponseStructure<UserResponseDTO>("User fetched successfully!",
+					responseDTO, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<UserResponseDTO>>(rs, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("Cannot fetch for INACTIVE users", HttpStatus.BAD_REQUEST);
 		}
@@ -81,7 +86,10 @@ public class UserServiceImpl implements UserService {
 					responseDTOs.add(dto);
 				}
 			}
-			return new ResponseEntity<List<UserResponseDTO>>(responseDTOs, HttpStatus.OK);
+
+			ResponseStructure<List<UserResponseDTO>> rs = new ResponseStructure<List<UserResponseDTO>>(
+					"Users fetched successfully!", responseDTOs, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<List<UserResponseDTO>>>(rs, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
 		}
