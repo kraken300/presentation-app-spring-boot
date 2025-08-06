@@ -48,6 +48,9 @@ public class User {
 	@OneToMany(mappedBy = "user")
 	private List<Presentation> presentations;
 
+	@OneToMany(mappedBy = "user")
+	private List<Rating> ratings;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.ACTIVE;

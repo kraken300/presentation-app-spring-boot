@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pa.dto.PresentationRequestDTO;
+import com.pa.dto.RatingRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.enums.PresentationStatus;
@@ -90,4 +91,18 @@ public class UserController {
 			@RequestParam Double userTotalScore) {
 		return userService.saveTotalScore(adminId, pid, userTotalScore);
 	}
+
+	// ************************* RATING *************************//
+
+	// ADMIN CAN RATE THE PRESENTATION BY STUDENT ID AND PRESENTATION ID (BY ADMIN
+	// ONLY)
+	@PostMapping("/rate/{id}")
+	public ResponseEntity<?> ratePresentation(@PathVariable(name = "id") Integer adminId,
+			@RequestParam(name = "id") Integer studentId, @RequestParam Integer pid,
+			@RequestBody RatingRequestDTO ratingRequestDTO) {
+		return userService.ratePresentation(adminId, studentId, pid, ratingRequestDTO);
+	}
+	
+	
+
 }

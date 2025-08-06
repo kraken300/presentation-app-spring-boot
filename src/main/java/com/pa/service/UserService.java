@@ -3,6 +3,7 @@ package com.pa.service;
 import org.springframework.http.ResponseEntity;
 
 import com.pa.dto.PresentationRequestDTO;
+import com.pa.dto.RatingRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.enums.PresentationStatus;
@@ -30,5 +31,8 @@ public interface UserService {
 	ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid, PresentationStatus presentationStatus);
 
 	ResponseEntity<?> saveTotalScore(Integer adminId, Integer pid, Double score);
+
+	ResponseEntity<?> ratePresentation(Integer adminId, Integer studentId, Integer pid,
+			RatingRequestDTO ratingRequestDTO);
 
 }

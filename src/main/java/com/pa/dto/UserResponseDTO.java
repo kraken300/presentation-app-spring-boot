@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.pa.entity.Presentation;
+import com.pa.entity.Rating;
 import com.pa.enums.Role;
 import com.pa.enums.Status;
 
@@ -23,6 +24,8 @@ public class UserResponseDTO {
 	private Long phone;
 
 	private List<Presentation> presentations;
+
+	private List<Rating> ratings;
 
 	private Status status;
 

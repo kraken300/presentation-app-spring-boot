@@ -36,8 +36,9 @@ public class Presentation {
 	@JsonIgnore
 	private User user;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "rating_id")
+	@JsonIgnore
 	private Rating rating;
 
 	private String course;

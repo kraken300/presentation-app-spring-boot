@@ -9,14 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.pa.controller.UserController;
+
 import com.pa.dao.PresentationDAO;
+import com.pa.dao.RatingDAO;
 import com.pa.dao.UserDAO;
 import com.pa.dto.PresentationRequestDTO;
+import com.pa.dto.RatingRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.dto.UserResponseDTO;
 import com.pa.entity.Presentation;
+import com.pa.entity.Rating;
 import com.pa.entity.User;
 import com.pa.enums.PresentationStatus;
 import com.pa.enums.Role;
@@ -31,6 +34,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private PresentationDAO presentationDAO;
+
+	@Autowired
+	private RatingDAO ratingDAO;
 
 	@Override
 	public ResponseEntity<?> registerUser(UserRequestDTO userRequestDTO) {
@@ -203,6 +209,42 @@ public class UserServiceImpl implements UserService {
 			return new ResponseEntity<ResponseStructure<Double>>(rs, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("Only Admin can assign score!", HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> ratePresentation(Integer adminId, Integer studentId, Integer pid,
+			RatingRequestDTO ratingRequestDTO) {
+		User admin = userDAO.findById(adminId);
+		
+		Double totalScore = ratingRequestDTO.getCommunication() + ratingRequestDTO.getConfidence()
+				+ ratingRequestDTO.getContent() + ratingRequestDTO.getInteraction() + ratingRequestDTO.getLiveliness()
+				+ ratingRequestDTO.getUsageProps();
+
+		if (admin.getRole() == Role.ADMIN) {
+			User student = userDAO.findById(studentId);
+			Presentation presentation = presentationDAO.findById(pid);
+
+			Rating rating = new Rating();
+			BeanUtils.copyProperties(ratingRequestDTO, rating);
+
+			if (presentation.getRating() != null) {
+				return new ResponseEntity<String>(
+						"Rating is already assigned to the presentation with id : " + presentation.getPid(),
+						HttpStatus.BAD_REQUEST);
+			}
+
+			presentation.setRating(rating);
+			rating.setUser(student);
+			rating.setTotalScore(totalScore);
+
+			Rating saved = ratingDAO.save(rating);
+
+			ResponseStructure<Rating> rs = new ResponseStructure<Rating>(
+					"Rating assigned to presentation with topic : " + presentation.getTopic(), saved, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Rating can be assigned by admin only!", HttpStatus.BAD_REQUEST);
 		}
 	}
 

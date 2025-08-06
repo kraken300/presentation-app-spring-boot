@@ -5,11 +5,15 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
@@ -22,23 +26,25 @@ public class Rating {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer rid;
+	private Double rid;
 
-	private Integer communication;
+	private Double communication;
 
-	private Integer confidence;
+	private Double confidence;
 
-	private Integer content;
+	private Double content;
 
-	private Integer interaction;
+	private Double interaction;
 
-	private Integer liveliness;
+	private Double liveliness;
 
-	private Integer usageProps;
+	private Double usageProps;
 
 	private Double totalScore;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id")
+	@JsonIgnore
 	private User user;
 
 	@OneToOne(mappedBy = "rating")
