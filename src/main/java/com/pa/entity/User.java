@@ -1,6 +1,6 @@
 package com.pa.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -60,8 +60,8 @@ public class User {
 
 	@CreationTimestamp
 	@Column(updatable = false)
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
 
 	@UpdateTimestamp
-	private LocalDate updatedAt;
+	private LocalDateTime updatedAt;
 }
