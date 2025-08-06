@@ -10,10 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.pa.dao.PresentationDAO;
 import com.pa.dao.UserDAO;
+import com.pa.dto.PresentationRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.dto.UserResponseDTO;
+import com.pa.entity.Presentation;
 import com.pa.entity.User;
 import com.pa.enums.Role;
 import com.pa.enums.Status;
@@ -24,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDAO;
+
+	@Autowired
+	private PresentationDAO presentationDAO;
 
 	@Override
 	public ResponseEntity<?> registerUser(UserRequestDTO userRequestDTO) {
@@ -108,6 +114,35 @@ public class UserServiceImpl implements UserService {
 		} else {
 			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> assignPresentation(Integer adminId, Integer userId,
+			PresentationRequestDTO presentationRequestDTO) {
+		User admin = userDAO.findById(adminId);
+
+		if (admin.getRole() == Role.ADMIN) {
+			User user = userDAO.findById(userId);
+
+			Presentation presentation = new Presentation();
+			BeanUtils.copyProperties(presentationRequestDTO, presentation);
+			presentation.setUser(user);
+//			User saved = userDAO.save(user);
+			Presentation saved = presentationDAO.save(presentation);
+
+			return new ResponseEntity<String>("Presentation assigned successfully!", HttpStatus.OK);
+
+		} else {
+			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getPresentationById(Integer pid) {
+		Presentation presentation = presentationDAO.findById(pid);
+		ResponseStructure<Presentation> rs = new ResponseStructure<Presentation>("Presentation fetched succesfully!",
+				presentation, HttpStatus.OK);
+		return new ResponseEntity<ResponseStructure<Presentation>>(rs, HttpStatus.OK);
 	}
 
 }

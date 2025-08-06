@@ -13,4 +13,9 @@ public class AppExceptionHandler {
 		return new ResponseEntity<String>(userNotFound.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
+	@ExceptionHandler(PresentationNotFound.class)
+	public ResponseEntity<String> handlePresentationNotFound(PresentationNotFound presentationNotFound) {
+		return new ResponseEntity<String>(presentationNotFound.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
 }

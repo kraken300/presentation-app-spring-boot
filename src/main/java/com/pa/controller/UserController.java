@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pa.dto.PresentationRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.enums.Status;
@@ -55,5 +56,17 @@ public class UserController {
 			@RequestParam(name = "id") Integer userId, @RequestParam Status status) {
 		return userService.updateStatus(adminId, userId, status);
 	}
-	
+
+	// ASSIGN PRESENTATION TO THE STUDENT BASED ON THE STUDENT ID (ONLY BY ADMIN)
+	@PostMapping("/assign/{id}")
+	public ResponseEntity<?> assignPresentation(@PathVariable(name = "id") Integer adminId,
+			@RequestParam(name = "id") Integer userId, @RequestBody PresentationRequestDTO presentationRequestDTO) {
+		return userService.assignPresentation(adminId, userId, presentationRequestDTO);
+	}
+
+	// FETCH PRESENTATION BY ID
+	@GetMapping("/getPresentation/{pid}")
+	public ResponseEntity<?> getPresentationById(@PathVariable Integer pid) {
+		return userService.getPresentationById(pid);
+	}
 }

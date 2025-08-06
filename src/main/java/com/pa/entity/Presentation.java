@@ -5,10 +5,14 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pa.enums.PresentationStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,8 +31,9 @@ public class Presentation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer pid;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id")
+	@JsonIgnore
 	private User user;
 
 	@OneToOne
@@ -37,11 +42,14 @@ public class Presentation {
 
 	private String course;
 
+	@Column(unique = true)
 	private String topic;
 
-	private PresentationStatus presentationStatus;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PresentationStatus presentationStatus = PresentationStatus.ASSIGNED;
 
-	private Double userTotalScore;
+	private Double userTotalScore = 0.0;
 
 	@CreationTimestamp
 	@Column(updatable = false)
