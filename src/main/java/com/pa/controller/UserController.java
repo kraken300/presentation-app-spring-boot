@@ -83,4 +83,11 @@ public class UserController {
 			@RequestParam PresentationStatus presentationStatus) {
 		return userService.changePresentationStatus(studentId, pid, presentationStatus);
 	}
+
+	// SAVE TOTAL SCORE OF THE PRESENTAION (BY ADMIN ONLY)
+	@PostMapping("/score/{id}")
+	public ResponseEntity<?> saveTotalScore(@PathVariable(name = "id") Integer adminId, @RequestParam Integer pid,
+			@RequestParam Double userTotalScore) {
+		return userService.saveTotalScore(adminId, pid, userTotalScore);
+	}
 }

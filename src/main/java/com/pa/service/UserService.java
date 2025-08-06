@@ -29,4 +29,6 @@ public interface UserService {
 
 	ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid, PresentationStatus presentationStatus);
 
+	ResponseEntity<?> saveTotalScore(Integer adminId, Integer pid, Double score);
+
 }

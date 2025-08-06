@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.pa.controller.UserController;
 import com.pa.dao.PresentationDAO;
 import com.pa.dao.UserDAO;
 import com.pa.dto.PresentationRequestDTO;
@@ -181,6 +181,28 @@ public class UserServiceImpl implements UserService {
 			return new ResponseEntity<ResponseStructure<PresentationStatus>>(rs, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> saveTotalScore(Integer adminId, Integer pid, Double score) {
+		User admin = userDAO.findById(adminId);
+
+		if (admin.getRole() == Role.ADMIN) {
+			Presentation presentation = presentationDAO.findById(pid);
+
+			if (presentation.getPresentationStatus() == PresentationStatus.COMPLETED) {
+				presentation.setUserTotalScore(score);
+			} else {
+				return new ResponseEntity<String>("Presentation is not completed!", HttpStatus.OK);
+			}
+
+			presentationDAO.save(presentation);
+			ResponseStructure<Double> rs = new ResponseStructure<Double>("Presentation score upated to ",
+					presentation.getUserTotalScore(), HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<Double>>(rs, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Only Admin can assign score!", HttpStatus.BAD_REQUEST);
 		}
 	}
 
