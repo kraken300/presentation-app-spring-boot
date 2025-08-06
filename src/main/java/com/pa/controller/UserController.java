@@ -69,4 +69,10 @@ public class UserController {
 	public ResponseEntity<?> getPresentationById(@PathVariable Integer pid) {
 		return userService.getPresentationById(pid);
 	}
+	
+	// FETCH ALL PRESENTATIONS BY STUDENT ID
+	@GetMapping("/getAllPresentation/{id}")
+	public ResponseEntity<?> getAllPresentationsById(@PathVariable Integer id){
+		return userService.getAllPresentations(id);
+	}
 }

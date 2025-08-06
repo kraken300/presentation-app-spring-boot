@@ -24,4 +24,6 @@ public interface UserService {
 
 	ResponseEntity<?> getPresentationById(Integer pid);
 
+	ResponseEntity<?> getAllPresentations(Integer id);
+
 }

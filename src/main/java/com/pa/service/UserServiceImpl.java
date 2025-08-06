@@ -145,4 +145,23 @@ public class UserServiceImpl implements UserService {
 		return new ResponseEntity<ResponseStructure<Presentation>>(rs, HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<?> getAllPresentations(Integer id) {
+		User user = userDAO.findById(id);
+
+		if (user.getRole() == Role.STUDENT) {
+			List<Presentation> presentations = user.getPresentations();
+
+			if (presentations.isEmpty()) {
+				return new ResponseEntity<String>("No presentation is assigned yet!", HttpStatus.OK);
+			}
+
+			ResponseStructure<List<Presentation>> rs = new ResponseStructure<List<Presentation>>(
+					"Presentations fetched successfully!", presentations, HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<List<Presentation>>>(rs, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
+		}
+	}
+
 }
