@@ -18,6 +18,7 @@ import com.pa.dto.UserRequestDTO;
 import com.pa.dto.UserResponseDTO;
 import com.pa.entity.Presentation;
 import com.pa.entity.User;
+import com.pa.enums.PresentationStatus;
 import com.pa.enums.Role;
 import com.pa.enums.Status;
 import com.pa.rs.ResponseStructure;
@@ -159,6 +160,25 @@ public class UserServiceImpl implements UserService {
 			ResponseStructure<List<Presentation>> rs = new ResponseStructure<List<Presentation>>(
 					"Presentations fetched successfully!", presentations, HttpStatus.OK);
 			return new ResponseEntity<ResponseStructure<List<Presentation>>>(rs, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid,
+			PresentationStatus presentationStatus) {
+
+		User user = userDAO.findById(pid);
+
+		if (user.getRole() == Role.STUDENT) {
+			Presentation presentation = presentationDAO.findById(pid);
+			presentation.setPresentationStatus(presentationStatus);
+			presentationDAO.save(presentation);
+
+			ResponseStructure<PresentationStatus> rs = new ResponseStructure<PresentationStatus>(
+					"Presentaion status updated to ", presentation.getPresentationStatus(), HttpStatus.OK);
+			return new ResponseEntity<ResponseStructure<PresentationStatus>>(rs, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
 		}

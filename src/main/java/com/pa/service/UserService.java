@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import com.pa.dto.PresentationRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
+import com.pa.enums.PresentationStatus;
 import com.pa.enums.Status;
 
 public interface UserService {
@@ -25,5 +26,7 @@ public interface UserService {
 	ResponseEntity<?> getPresentationById(Integer pid);
 
 	ResponseEntity<?> getAllPresentations(Integer id);
+
+	ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid, PresentationStatus presentationStatus);
 
 }

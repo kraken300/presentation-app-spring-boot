@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pa.dto.PresentationRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
+import com.pa.enums.PresentationStatus;
 import com.pa.enums.Status;
 import com.pa.service.UserService;
 
@@ -69,10 +70,17 @@ public class UserController {
 	public ResponseEntity<?> getPresentationById(@PathVariable Integer pid) {
 		return userService.getPresentationById(pid);
 	}
-	
+
 	// FETCH ALL PRESENTATIONS BY STUDENT ID
 	@GetMapping("/getAllPresentation/{id}")
-	public ResponseEntity<?> getAllPresentationsById(@PathVariable Integer id){
+	public ResponseEntity<?> getAllPresentationsById(@PathVariable Integer id) {
 		return userService.getAllPresentations(id);
+	}
+
+	// CHANGE PRESENTATION STATUS (BY STUDENT)
+	@PostMapping("/changeStatus/{id}")
+	public ResponseEntity<?> changeStatus(@PathVariable(name = "id") Integer studentId, @RequestParam Integer pid,
+			@RequestParam PresentationStatus presentationStatus) {
+		return userService.changePresentationStatus(studentId, pid, presentationStatus);
 	}
 }
