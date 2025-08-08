@@ -35,4 +35,8 @@ public interface UserService {
 	ResponseEntity<?> ratePresentation(Integer adminId, Integer studentId, Integer pid,
 			RatingRequestDTO ratingRequestDTO);
 
+	ResponseEntity<?> getRatingByPresentationId(Integer pid);
+
+	ResponseEntity<?> getAllRatingsByStudentId(Integer id);
+
 }

@@ -102,7 +102,17 @@ public class UserController {
 			@RequestBody RatingRequestDTO ratingRequestDTO) {
 		return userService.ratePresentation(adminId, studentId, pid, ratingRequestDTO);
 	}
-	
-	
+
+	// GET THE RATING OF PARTICULAR PRESENTATION
+	@GetMapping("/getRating/{pid}")
+	public ResponseEntity<?> getRating(@PathVariable Integer pid) {
+		return userService.getRatingByPresentationId(pid);
+	}
+
+	// GET ALL RATINGS OF PARTICULAR STUDENT
+	@GetMapping("/getAllRating/{id}")
+	public ResponseEntity<?> getAllRatings(@PathVariable Integer id) {
+		return userService.getAllRatingsByStudentId(id);
+	}
 
 }

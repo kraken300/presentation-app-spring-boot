@@ -175,8 +175,10 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid,
 			PresentationStatus presentationStatus) {
 
-		User user = userDAO.findById(pid);
+		User user = userDAO.findById(studentId);
 
+		
+		// TODO : ADD logic so that other student cannot change other student's presentation status
 		if (user.getRole() == Role.STUDENT) {
 			Presentation presentation = presentationDAO.findById(pid);
 			presentation.setPresentationStatus(presentationStatus);
@@ -216,7 +218,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<?> ratePresentation(Integer adminId, Integer studentId, Integer pid,
 			RatingRequestDTO ratingRequestDTO) {
 		User admin = userDAO.findById(adminId);
-		
+
 		Double totalScore = ratingRequestDTO.getCommunication() + ratingRequestDTO.getConfidence()
 				+ ratingRequestDTO.getContent() + ratingRequestDTO.getInteraction() + ratingRequestDTO.getLiveliness()
 				+ ratingRequestDTO.getUsageProps();
@@ -234,6 +236,7 @@ public class UserServiceImpl implements UserService {
 						HttpStatus.BAD_REQUEST);
 			}
 
+			// TODO : Only assign ratings to COMPLETED Presentation
 			presentation.setRating(rating);
 			rating.setUser(student);
 			rating.setTotalScore(totalScore);
@@ -246,6 +249,24 @@ public class UserServiceImpl implements UserService {
 		} else {
 			return new ResponseEntity<String>("Rating can be assigned by admin only!", HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> getRatingByPresentationId(Integer pid) {
+		Presentation presentation = presentationDAO.findById(pid);
+		Rating rating = presentation.getRating();
+		ResponseStructure<Rating> rs = new ResponseStructure<Rating>("Rating fetched successfully!", rating,
+				HttpStatus.OK);
+		return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> getAllRatingsByStudentId(Integer id) {
+		User student = userDAO.findById(id);
+		List<Rating> ratings = student.getRatings();
+		ResponseStructure<List<Rating>> rs = new ResponseStructure<List<Rating>>(
+				"All ratings fetched successfully for student " + student.getName(), ratings, HttpStatus.OK);
+		return new ResponseEntity<ResponseStructure<List<Rating>>>(rs, HttpStatus.OK);
 	}
 
 }
