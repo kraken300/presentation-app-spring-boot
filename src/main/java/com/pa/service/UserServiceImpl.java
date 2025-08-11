@@ -136,8 +136,8 @@ public class UserServiceImpl implements UserService {
 			presentation.setUser(user);
 //			User saved = userDAO.save(user);
 			Presentation saved = presentationDAO.save(presentation);
-
-			return new ResponseEntity<String>("Presentation assigned successfully!", HttpStatus.OK);
+			return new ResponseEntity<String>("Presentation with pid : " + saved.getPid()
+					+ "is assigned successfully to student with id : " + user.getId(), HttpStatus.OK);
 
 		} else {
 			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
@@ -177,16 +177,23 @@ public class UserServiceImpl implements UserService {
 
 		User user = userDAO.findById(studentId);
 
-		
-		// TODO : ADD logic so that other student cannot change other student's presentation status
+		// TODO : ADD logic so that one student cannot change other student's
+		// presentation status
 		if (user.getRole() == Role.STUDENT) {
 			Presentation presentation = presentationDAO.findById(pid);
-			presentation.setPresentationStatus(presentationStatus);
-			presentationDAO.save(presentation);
 
-			ResponseStructure<PresentationStatus> rs = new ResponseStructure<PresentationStatus>(
-					"Presentaion status updated to ", presentation.getPresentationStatus(), HttpStatus.OK);
-			return new ResponseEntity<ResponseStructure<PresentationStatus>>(rs, HttpStatus.OK);
+			List<Presentation> presentations = user.getPresentations();
+			for (Presentation p : presentations) {
+				if (presentation.getPid() == p.getPid()) {
+					presentation.setPresentationStatus(presentationStatus);
+					presentationDAO.save(presentation);
+
+					ResponseStructure<PresentationStatus> rs = new ResponseStructure<PresentationStatus>(
+							"Presentaion status updated to ", presentation.getPresentationStatus(), HttpStatus.OK);
+					return new ResponseEntity<ResponseStructure<PresentationStatus>>(rs, HttpStatus.OK);
+				}
+			}
+			return new ResponseEntity<String>("Unauthorized presentation access!", HttpStatus.UNAUTHORIZED);
 		} else {
 			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
 		}
@@ -236,16 +243,25 @@ public class UserServiceImpl implements UserService {
 						HttpStatus.BAD_REQUEST);
 			}
 
-			// TODO : Only assign ratings to COMPLETED Presentation
-			presentation.setRating(rating);
-			rating.setUser(student);
-			rating.setTotalScore(totalScore);
+			// TODO : Only assign rating to COMPLETED Presentation
+			if (presentation.getPresentationStatus() == PresentationStatus.COMPLETED) {
+				presentation.setRating(rating);
+				rating.setUser(student);
+				rating.setTotalScore(totalScore);
 
-			Rating saved = ratingDAO.save(rating);
+				Rating saved = ratingDAO.save(rating);
 
-			ResponseStructure<Rating> rs = new ResponseStructure<Rating>(
-					"Rating assigned to presentation with topic : " + presentation.getTopic(), saved, HttpStatus.OK);
-			return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
+				ResponseStructure<Rating> rs = new ResponseStructure<Rating>(
+						"Rating assigned to presentation with topic : " + presentation.getTopic(), saved,
+						HttpStatus.OK);
+				return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<String>(
+						"Rating can only be assigned to the completed presentation. Current presentation status : "
+								+ presentation.getPresentationStatus(),
+						HttpStatus.BAD_REQUEST);
+			}
+
 		} else {
 			return new ResponseEntity<String>("Rating can be assigned by admin only!", HttpStatus.BAD_REQUEST);
 		}
