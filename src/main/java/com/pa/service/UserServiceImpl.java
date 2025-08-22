@@ -226,9 +226,9 @@ public class UserServiceImpl implements UserService {
 			RatingRequestDTO ratingRequestDTO) {
 		User admin = userDAO.findById(adminId);
 
-		Double totalScore = ratingRequestDTO.getCommunication() + ratingRequestDTO.getConfidence()
+		Double totalScore = ((ratingRequestDTO.getCommunication() + ratingRequestDTO.getConfidence()
 				+ ratingRequestDTO.getContent() + ratingRequestDTO.getInteraction() + ratingRequestDTO.getLiveliness()
-				+ ratingRequestDTO.getUsageProps();
+				+ ratingRequestDTO.getUsageProps()) / 6);
 
 		if (admin.getRole() == Role.ADMIN) {
 			User student = userDAO.findById(studentId);
@@ -245,9 +245,14 @@ public class UserServiceImpl implements UserService {
 
 			// TODO : Only assign rating to COMPLETED Presentation
 			if (presentation.getPresentationStatus() == PresentationStatus.COMPLETED) {
-				presentation.setRating(rating);
-				rating.setUser(student);
 				rating.setTotalScore(totalScore);
+				rating.setUser(student);
+//				presentation.setRating(rating);
+				rating.setPresentation(presentation);
+				presentation.setUserTotalScore(totalScore);
+				
+				
+				// TODO: Assign total score to user by calculating the average of all presentations score
 
 				Rating saved = ratingDAO.save(rating);
 
