@@ -48,6 +48,7 @@ public class Rating {
 	private User user;
 
 	@OneToOne(mappedBy = "rating", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private Presentation presentation;
 
 	@CreationTimestamp

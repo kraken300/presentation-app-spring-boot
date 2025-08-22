@@ -234,6 +234,15 @@ public class UserServiceImpl implements UserService {
 			User student = userDAO.findById(studentId);
 			Presentation presentation = presentationDAO.findById(pid);
 
+			List<Presentation> allPresentations = student.getPresentations();
+			Double sum = 0.0;
+			for (Presentation presentation2 : allPresentations) {
+				System.out.println(presentation2.getUserTotalScore());
+				sum = sum + presentation2.getUserTotalScore();
+			}
+
+			System.out.println(sum / allPresentations.size());
+
 			Rating rating = new Rating();
 			BeanUtils.copyProperties(ratingRequestDTO, rating);
 
@@ -250,9 +259,10 @@ public class UserServiceImpl implements UserService {
 //				presentation.setRating(rating);
 				rating.setPresentation(presentation);
 				presentation.setUserTotalScore(totalScore);
-				
-				
-				// TODO: Assign total score to user by calculating the average of all presentations score
+
+				// TODO: Assign total score to user by calculating the average of all
+				// presentations score
+				student.setUserTotalScore(sum / allPresentations.size());
 
 				Rating saved = ratingDAO.save(rating);
 
