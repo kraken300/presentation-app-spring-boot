@@ -11,11 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pa.dto.PresentationRequestDTO;
-import com.pa.dto.RatingRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
-import com.pa.enums.PresentationStatus;
 import com.pa.enums.Status;
 import com.pa.service.UserService;
 
@@ -57,62 +54,6 @@ public class UserController {
 	public ResponseEntity<String> updateStatus(@PathVariable(name = "id") Integer adminId,
 			@RequestParam(name = "id") Integer userId, @RequestParam Status status) {
 		return userService.updateStatus(adminId, userId, status);
-	}
-
-	// ASSIGN PRESENTATION TO THE STUDENT BASED ON THE STUDENT ID (ONLY BY ADMIN)
-	@PostMapping("/assign/{id}")
-	public ResponseEntity<?> assignPresentation(@PathVariable(name = "id") Integer adminId,
-			@RequestParam(name = "id") Integer userId, @RequestBody PresentationRequestDTO presentationRequestDTO) {
-		return userService.assignPresentation(adminId, userId, presentationRequestDTO);
-	}
-
-	// FETCH PRESENTATION BY ID
-	@GetMapping("/getPresentation/{pid}")
-	public ResponseEntity<?> getPresentationById(@PathVariable Integer pid) {
-		return userService.getPresentationById(pid);
-	}
-
-	// FETCH ALL PRESENTATIONS BY STUDENT ID
-	@GetMapping("/getAllPresentation/{id}")
-	public ResponseEntity<?> getAllPresentationsById(@PathVariable Integer id) {
-		return userService.getAllPresentations(id);
-	}
-
-	// CHANGE PRESENTATION STATUS (BY STUDENT)
-	@PostMapping("/changeStatus/{id}")
-	public ResponseEntity<?> changeStatus(@PathVariable(name = "id") Integer studentId, @RequestParam Integer pid,
-			@RequestParam PresentationStatus presentationStatus) {
-		return userService.changePresentationStatus(studentId, pid, presentationStatus);
-	}
-
-	// SAVE TOTAL SCORE OF THE PRESENTAION (BY ADMIN ONLY)
-	@PostMapping("/score/{id}")
-	public ResponseEntity<?> saveTotalScore(@PathVariable(name = "id") Integer adminId, @RequestParam Integer pid,
-			@RequestParam Double userTotalScore) {
-		return userService.saveTotalScore(adminId, pid, userTotalScore);
-	}
-
-	// ************************* RATING *************************//
-
-	// ADMIN CAN RATE THE PRESENTATION BY STUDENT ID AND PRESENTATION ID (BY ADMIN
-	// ONLY)
-	@PostMapping("/rate/{id}")
-	public ResponseEntity<?> ratePresentation(@PathVariable(name = "id") Integer adminId,
-			@RequestParam(name = "id") Integer studentId, @RequestParam Integer pid,
-			@RequestBody RatingRequestDTO ratingRequestDTO) {
-		return userService.ratePresentation(adminId, studentId, pid, ratingRequestDTO);
-	}
-
-	// GET THE RATING OF PARTICULAR PRESENTATION
-	@GetMapping("/getRating/{pid}")
-	public ResponseEntity<?> getRating(@PathVariable Integer pid) {
-		return userService.getRatingByPresentationId(pid);
-	}
-
-	// GET OVERALL PRESENTATION RATING OF PARTICULAR STUDENT
-	@GetMapping("/getOverallRating/{id}")
-	public ResponseEntity<?> getOverallRating(@PathVariable Integer id) {
-		return userService.getOverallRatingByStudentId(id);
 	}
 
 }

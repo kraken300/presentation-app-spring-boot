@@ -10,18 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.pa.dao.PresentationDAO;
-import com.pa.dao.RatingDAO;
 import com.pa.dao.UserDAO;
-import com.pa.dto.PresentationRequestDTO;
-import com.pa.dto.RatingRequestDTO;
 import com.pa.dto.UserLoginDTO;
 import com.pa.dto.UserRequestDTO;
 import com.pa.dto.UserResponseDTO;
-import com.pa.entity.Presentation;
-import com.pa.entity.Rating;
 import com.pa.entity.User;
-import com.pa.enums.PresentationStatus;
 import com.pa.enums.Role;
 import com.pa.enums.Status;
 import com.pa.rs.ResponseStructure;
@@ -31,12 +24,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDAO;
-
-	@Autowired
-	private PresentationDAO presentationDAO;
-
-	@Autowired
-	private RatingDAO ratingDAO;
 
 	@Override
 	public ResponseEntity<?> registerUser(UserRequestDTO userRequestDTO) {
@@ -121,184 +108,6 @@ public class UserServiceImpl implements UserService {
 		} else {
 			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
 		}
-	}
-
-	@Override
-	public ResponseEntity<?> assignPresentation(Integer adminId, Integer userId,
-			PresentationRequestDTO presentationRequestDTO) {
-		User admin = userDAO.findById(adminId);
-
-		if (admin.getRole() == Role.ADMIN) {
-			User user = userDAO.findById(userId);
-
-			Presentation presentation = new Presentation();
-			BeanUtils.copyProperties(presentationRequestDTO, presentation);
-			presentation.setUser(user);
-//			User saved = userDAO.save(user);
-			Presentation saved = presentationDAO.save(presentation);
-			return new ResponseEntity<String>("Presentation with pid : " + saved.getPid()
-					+ "is assigned successfully to student with id : " + user.getId(), HttpStatus.OK);
-
-		} else {
-			return new ResponseEntity<String>("This operation can be done by ADMIN only!", HttpStatus.UNAUTHORIZED);
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> getPresentationById(Integer pid) {
-		Presentation presentation = presentationDAO.findById(pid);
-		ResponseStructure<Presentation> rs = new ResponseStructure<Presentation>("Presentation fetched succesfully!",
-				presentation, HttpStatus.OK);
-		return new ResponseEntity<ResponseStructure<Presentation>>(rs, HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity<?> getAllPresentations(Integer id) {
-		User user = userDAO.findById(id);
-
-		if (user.getRole() == Role.STUDENT) {
-			List<Presentation> presentations = user.getPresentations();
-
-			if (presentations.isEmpty()) {
-				return new ResponseEntity<String>("No presentation is assigned yet!", HttpStatus.OK);
-			}
-
-			ResponseStructure<List<Presentation>> rs = new ResponseStructure<List<Presentation>>(
-					"Presentations fetched successfully!", presentations, HttpStatus.OK);
-			return new ResponseEntity<ResponseStructure<List<Presentation>>>(rs, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> changePresentationStatus(Integer studentId, Integer pid,
-			PresentationStatus presentationStatus) {
-
-		User user = userDAO.findById(studentId);
-
-		// TODO : ADD logic so that one student cannot change other student's
-		// presentation status
-		if (user.getRole() == Role.STUDENT) {
-			Presentation presentation = presentationDAO.findById(pid);
-
-			List<Presentation> presentations = user.getPresentations();
-			for (Presentation p : presentations) {
-				if (presentation.getPid() == p.getPid()) {
-					presentation.setPresentationStatus(presentationStatus);
-					presentationDAO.save(presentation);
-
-					ResponseStructure<PresentationStatus> rs = new ResponseStructure<PresentationStatus>(
-							"Presentaion status updated to ", presentation.getPresentationStatus(), HttpStatus.OK);
-					return new ResponseEntity<ResponseStructure<PresentationStatus>>(rs, HttpStatus.OK);
-				}
-			}
-			return new ResponseEntity<String>("Unauthorized presentation access!", HttpStatus.UNAUTHORIZED);
-		} else {
-			return new ResponseEntity<String>("Presentations are assigned to students only!", HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> saveTotalScore(Integer adminId, Integer pid, Double score) {
-		User admin = userDAO.findById(adminId);
-
-		if (admin.getRole() == Role.ADMIN) {
-			Presentation presentation = presentationDAO.findById(pid);
-
-			if (presentation.getPresentationStatus() == PresentationStatus.COMPLETED) {
-				presentation.setUserTotalScore(score);
-			} else {
-				return new ResponseEntity<String>("Presentation is not completed!", HttpStatus.OK);
-			}
-
-			presentationDAO.save(presentation);
-			ResponseStructure<Double> rs = new ResponseStructure<Double>("Presentation score upated to ",
-					presentation.getUserTotalScore(), HttpStatus.OK);
-			return new ResponseEntity<ResponseStructure<Double>>(rs, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("Only Admin can assign score!", HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> ratePresentation(Integer adminId, Integer studentId, Integer pid,
-			RatingRequestDTO ratingRequestDTO) {
-		User admin = userDAO.findById(adminId);
-
-		Double totalScore = ((ratingRequestDTO.getCommunication() + ratingRequestDTO.getConfidence()
-				+ ratingRequestDTO.getContent() + ratingRequestDTO.getInteraction() + ratingRequestDTO.getLiveliness()
-				+ ratingRequestDTO.getUsageProps()) / 6);
-
-		if (admin.getRole() == Role.ADMIN) {
-			User student = userDAO.findById(studentId);
-			Presentation presentation = presentationDAO.findById(pid);
-
-			List<Presentation> allPresentations = student.getPresentations();
-			Double sum = 0.0;
-			for (Presentation presentation2 : allPresentations) {
-				System.out.println(presentation2.getUserTotalScore());
-				sum = sum + presentation2.getUserTotalScore();
-			}
-
-			System.out.println(sum / allPresentations.size());
-
-			Rating rating = new Rating();
-			BeanUtils.copyProperties(ratingRequestDTO, rating);
-
-			if (presentation.getRating() != null) {
-				return new ResponseEntity<String>(
-						"Rating is already assigned to the presentation with id : " + presentation.getPid(),
-						HttpStatus.BAD_REQUEST);
-			}
-
-			// TODO : Only assign rating to COMPLETED Presentation
-			if (presentation.getPresentationStatus() == PresentationStatus.COMPLETED) {
-				rating.setTotalScore(totalScore);
-				rating.setUser(student);
-//				presentation.setRating(rating);
-				rating.setPresentation(presentation);
-				presentation.setUserTotalScore(totalScore);
-
-				// TODO: Assign total score to user by calculating the average of all
-				// presentations score
-				student.setUserTotalScore(sum / allPresentations.size());
-
-				Rating saved = ratingDAO.save(rating);
-
-				ResponseStructure<Rating> rs = new ResponseStructure<Rating>(
-						"Rating assigned to presentation with topic : " + presentation.getTopic(), saved,
-						HttpStatus.OK);
-				return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<String>(
-						"Rating can only be assigned to the completed presentation. Current presentation status : "
-								+ presentation.getPresentationStatus(),
-						HttpStatus.BAD_REQUEST);
-			}
-
-		} else {
-			return new ResponseEntity<String>("Rating can be assigned by admin only!", HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@Override
-	public ResponseEntity<?> getRatingByPresentationId(Integer pid) {
-		Presentation presentation = presentationDAO.findById(pid);
-		Rating rating = presentation.getRating();
-		ResponseStructure<Rating> rs = new ResponseStructure<Rating>("Rating fetched successfully!", rating,
-				HttpStatus.OK);
-		return new ResponseEntity<ResponseStructure<Rating>>(rs, HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity<?> getOverallRatingByStudentId(Integer id) {
-		User student = userDAO.findById(id);
-		Double userTotalScore = student.getUserTotalScore();
-		ResponseStructure<Double> rs = new ResponseStructure<Double>(
-				"Overall presentation rating fetched successfully for student : " + student.getName(), userTotalScore,
-				HttpStatus.OK);
-		return new ResponseEntity<ResponseStructure<Double>>(rs, HttpStatus.OK);
 	}
 
 }
