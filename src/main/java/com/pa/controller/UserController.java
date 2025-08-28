@@ -109,10 +109,10 @@ public class UserController {
 		return userService.getRatingByPresentationId(pid);
 	}
 
-	// GET ALL RATINGS OF PARTICULAR STUDENT
-	@GetMapping("/getAllRating/{id}")
-	public ResponseEntity<?> getAllRatings(@PathVariable Integer id) {
-		return userService.getAllRatingsByStudentId(id);
+	// GET OVERALL PRESENTATION RATING OF PARTICULAR STUDENT
+	@GetMapping("/getOverallRating/{id}")
+	public ResponseEntity<?> getOverallRating(@PathVariable Integer id) {
+		return userService.getOverallRatingByStudentId(id);
 	}
 
 }

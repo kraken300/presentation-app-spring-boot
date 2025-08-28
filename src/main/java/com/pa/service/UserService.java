@@ -37,6 +37,6 @@ public interface UserService {
 
 	ResponseEntity<?> getRatingByPresentationId(Integer pid);
 
-	ResponseEntity<?> getAllRatingsByStudentId(Integer id);
+	ResponseEntity<?> getOverallRatingByStudentId(Integer id);
 
 }

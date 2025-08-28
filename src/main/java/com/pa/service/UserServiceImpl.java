@@ -292,12 +292,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseEntity<?> getAllRatingsByStudentId(Integer id) {
+	public ResponseEntity<?> getOverallRatingByStudentId(Integer id) {
 		User student = userDAO.findById(id);
-		List<Rating> ratings = student.getRatings();
-		ResponseStructure<List<Rating>> rs = new ResponseStructure<List<Rating>>(
-				"All ratings fetched successfully for student " + student.getName(), ratings, HttpStatus.OK);
-		return new ResponseEntity<ResponseStructure<List<Rating>>>(rs, HttpStatus.OK);
+		Double userTotalScore = student.getUserTotalScore();
+		ResponseStructure<Double> rs = new ResponseStructure<Double>(
+				"Overall presentation rating fetched successfully for student : " + student.getName(), userTotalScore,
+				HttpStatus.OK);
+		return new ResponseEntity<ResponseStructure<Double>>(rs, HttpStatus.OK);
 	}
 
 }
